@@ -1,4 +1,8 @@
-﻿Shader "Custom/GeoShader_Spheres"
+﻿// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+// Upgrade NOTE: replaced '_World2Object' with 'unity_WorldToObject'
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+Shader "Custom/GeoShader_Spheres"
 {
 	Properties
 	{
@@ -77,7 +81,7 @@
 
 					//Put this vertex into World space from it's local space
 					float4 vPos = float4(_ParticleBuffer[id].position, 1.0f);
-					output.pos = mul(_Object2World, vPos);
+					output.pos = mul(unity_ObjectToWorld, vPos);
 
 					//Check if particle is active or not
 					if (_ParticleBuffer[id].active)
@@ -124,8 +128,8 @@
 					//Create Quad only particle is ACTIVE
 					if (p[0].active)
 					{
-						float4x4 vp = mul(UNITY_MATRIX_MVP, _World2Object); //put the Quad into View Space
-
+						//float4x4 vp = UnityObjectToClipPos(unity_WorldToObject); //put the Quad into View Space
+						float4x4 vp = UNITY_MATRIX_MVP;
 						//Simple UVs for each triangle
 						//   1
 						//  / \

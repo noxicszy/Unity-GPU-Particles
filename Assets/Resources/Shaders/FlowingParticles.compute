@@ -215,7 +215,13 @@ void CS_Emit()
 	particleBuffer[id] = p;
 }
 
-
+float3 PointProjOntoPlane(float3 normal, float3 surfacePoint, float3 Point)
+{
+	float3 v = Point - surfacePoint;
+	float3 w = normal;
+	float3 v_verticle = v - dot(v, w) / dot(w, w) * w;
+	return surfacePoint + v_verticle;
+}
 //Updates each particle to move and/or collide
 [numthreads(THREAD_COUNT, 1, 1)] //X * Y * Z threads
 void CS_Update (uint3 id : SV_DispatchThreadID)
@@ -259,18 +265,23 @@ void CS_Update (uint3 id : SV_DispatchThreadID)
 					if (distSq <= CollisionThreshold + (_ParticleRadius * _ParticleRadius))
 					{
 						//Reflect particle velocity by the surface Normal
-						float ns = (node.Max.x - node.Min.x) * 0.5f;
-						float3 nodeCenter = float3(node.Min.x + ns, node.Min.y + ns, node.Min.z + ns);
+						float ns1 = (node.Max.x - node.Min.x) * 0.5f;
+						float ns2 = (node.Max.y - node.Min.y) * 0.5f;
+						float ns3 = (node.Max.z - node.Min.z) * 0.5f;
+						float3 nodeCenter = float3(node.Min.x + ns1, node.Min.y + ns2, node.Min.z + ns3);
 						float3 surfaceNormal = normalize(node.Point - nodeCenter);
 						float3 vel = p.velocity;
 
-						//only reflect if the Reflect Vector is with-in some range
-						if (dot(vel, surfaceNormal) > -0.25f)
-						{
-							//Reflection formula: https://math.stackexchange.com/questions/13261/how-to-get-a-reflection-vector
-							p.velocity = vel - (2.0f*((dot(vel, surfaceNormal)*surfaceNormal)) * _ParticleBounce); //works well but doesn't lose much velocity after hit
-						}
-
+						////only reflect if the Reflect Vector is with-in some range
+						//if (dot(vel, surfaceNormal) > -0.25f)
+						//{
+						//	//Reflection formula: https://math.stackexchange.com/questions/13261/how-to-get-a-reflection-vector
+						//	p.velocity = vel - (2.0f*((dot(vel, surfaceNormal)*surfaceNormal)) * _ParticleBounce); //works well but doesn't lose much velocity after hit
+						//	//p.velocity = float3(0, 0, 0);
+						//}
+						//p.velocity = vel - (2.0f * ((dot(vel, surfaceNormal) * surfaceNormal)) * _ParticleBounce); //works well but doesn't lose much velocity after hit
+						p.position = PointProjOntoPlane(-surfaceNormal, node.Point, p.position);
+						p.velocity = float3(0, 0, 0);
 					}
 
 				}

@@ -13,7 +13,7 @@ public class Voxelizer : MonoBehaviour
 {
     [Range(10, 50)]
     public int VoxelSize = 20; //How big the initial Root Cube is
-    [Range(1, 5)]
+    [Range(1, 20)]
     public int TreeDepth = 2;
 
     [HideInInspector]
@@ -154,6 +154,8 @@ public class Voxelizer : MonoBehaviour
     void Build_Octree ()
     {
         RayDirs = PointsOnSphere.GetPoints((float)RayDirections);
+
+        
 
         //First step all Scene geometry send their Meshes to the Octree class
         if(Octree.All_OBBs == null)
