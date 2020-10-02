@@ -73,7 +73,7 @@ public class Particle_Flowing : MonoBehaviour
     public float EmitterSpread = 0.2f;
     public Vector3 Gravity = new Vector3(0.0f, -9.81f, 0.0f);
 
-    public float CollisionThreshold = 1.5f;   
+    public float CollisionThreshold = 2.0f;   
 
     //=============================================================================================================================================
     //Helper function to determine how many particles are in the ParticlePoolBuffer on the GPU
@@ -153,7 +153,7 @@ public class Particle_Flowing : MonoBehaviour
         CB_particleBuffer = new ComputeBuffer(particleCount, Marshal.SizeOf(typeof(Particle)));
         CB_particlePool = new ComputeBuffer(particleCount, sizeof(int), ComputeBufferType.Append); //Buffer is like a Stack for Appending/Consuming things on the GPU
         //CB_particlePool.SetCounterValue(0); //This shouldn't even be necessary???
-        CB_particleCounterCopy = new ComputeBuffer(4, sizeof(int), ComputeBufferType.DrawIndirect); //.IndirectArguments for Unity 5.4 and up
+        CB_particleCounterCopy = new ComputeBuffer(4, sizeof(int), ComputeBufferType.IndirectArguments); //.IndirectArguments for Unity 5.4 and up
         particleCounter = new int[] { 0, 1, 0, 0 };
 
         //Set Compute shader varriables..if you want to dynamically change these then you have to set these in FixedUpdate every frame
@@ -309,7 +309,7 @@ public class Particle_Flowing : MonoBehaviour
     //=============================================================================================================================================
     void OnRenderObject() 
     {
-        if (Camera.current == Camera.main)
+        if (true)
         {
             material.SetBuffer("_ParticleBuffer", CB_particleBuffer);
 
@@ -318,7 +318,7 @@ public class Particle_Flowing : MonoBehaviour
 
             //Draws mesh on the GPU in a geometry shader
             //Draw Points(In the Geo Shader it will turn them to Quads), vertex Count = 1, and Instance count = NumParticles
-            Graphics.DrawProcedural(MeshTopology.Points, particleCount);
+            Graphics.DrawProceduralNow(MeshTopology.Points, particleCount);
         }
     }
 
