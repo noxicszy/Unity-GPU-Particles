@@ -12,9 +12,9 @@ using System.IO; //for Read/Write of files
 public class Voxelizer : MonoBehaviour
 {
     [Range(10, 50)]
-    public int VoxelSize = 20; //How big the initial Root Cube is
+    public int VoxelSize = 30; //How big the initial Root Cube is
     [Range(1, 20)]
-    public int TreeDepth = 2;
+    public int TreeDepth = 5;
 
     [HideInInspector]
     public Octree OCTREE = null;
@@ -36,6 +36,10 @@ public class Voxelizer : MonoBehaviour
     public string Octree_Name;
     public int RayDirections = 100; //How many Rays to shoot outward from each node
 
+    public void OnEnable()
+    {
+        BAKE_OCTREE();
+    }
     //=====================================================================================================================
     // This function creates the Octree and then saves it out as a Prefab
     //=====================================================================================================================
@@ -282,8 +286,9 @@ public class Voxelizer : MonoBehaviour
                 //Unity 5.7 has Physics.ClosestPoint(Vec3 p) 
 
                 //This is my version of it
-                Vector3 surfacePoint = ClosesPointOnCollider(node.Position);
-                if(surfacePoint == node.Position)
+                //Vector3 surfacePoint_old = ClosesPointOnCollider(node.Position);
+                Vector3 surfacePoint = ClosesPointOnColliders(node.Position);
+                if (surfacePoint == node.Position)
                 {
                     node.InsideMesh = true;
                 }
@@ -417,6 +422,22 @@ public class Voxelizer : MonoBehaviour
     //=============================================================================================================================================
     //Helper Functions to Find the closest approximate point on a collider from a Vector3.. Note Unity 5.7 and up has this as Physics.ClosestPoint
     //=============================================================================================================================================
+    Vector3 ClosesPointOnColliders(Vector3 p)
+    {
+        Collider[] allColliders = GameObject.FindObjectsOfType<Collider>();
+        float minDis = float.PositiveInfinity;
+        Vector3 minDisPoint = Vector3.zero;
+        foreach(Collider collider in allColliders)
+        {
+            Vector3 closePoint = collider.ClosestPoint(p);
+            if(Vector3.Distance(closePoint, p) < minDis)
+            {
+                minDis = Vector3.Distance(closePoint, p);
+                minDisPoint = closePoint;
+            }
+        }
+        return minDisPoint;
+    }
     Vector3 ClosesPointOnCollider(Vector3 p)
     {
         Vector3 closestPoint = p;

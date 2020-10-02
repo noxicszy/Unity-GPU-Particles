@@ -51,6 +51,7 @@ public class Particle_Flowing : MonoBehaviour
 
     public Baked_Octree octree; //a pre-baked octree as a prefab
     public string Octree_File; //name of the file 
+    public Voxelizer voxelizer;
 
     //=============================================================================================================================================
     //Publics
@@ -275,6 +276,7 @@ public class Particle_Flowing : MonoBehaviour
     //=============================================================================================================================================
     void Start()
     {
+        //voxelizer.BAKE_OCTREE();
         if(!isInitialized)
         {
             Debug.Log("Start.initializing");
